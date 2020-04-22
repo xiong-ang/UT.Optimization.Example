@@ -79,7 +79,7 @@ public interface IFileSystemOperation
 这样，可以将被测方法InitializeConfigFile对静态类File和Directory的依赖，变成了对IFileSystemOperation的依赖。    
 然后，在测试过程中，我们需要创建依赖的Stub对象，因此，还需要通过设置依赖注入点。   
 
-* 设置注入点：   
+* 设置注入点（构造函数方式）：   
 ```C#   
 private readonly IFileSystemOperation _fileSystemOperator;
 
@@ -162,20 +162,15 @@ public interface IHttpClientWrapper
 ```   
 基于此，可以设置注入点，修改原始依赖。    
 
-* 设置注入点：   
+* 设置注入点（属性方式）：   
 ```C#
-private readonly IFileSystemOperation _fileSystemOperator;
+// Used by unit test
+public IHttpClientWrapper HttpClientWrapper { private get; set; };
 
 // Default
 public OptimizedTarget()
 {
-    _httpClientWrapper = new HttpClientWrapper();
-}
-
-// Used by unit test
-public OptimizedTarget(IHttpClientWrapper httpClientWrapper)
-{
-    this._httpClientWrapper = httpClientWrapper;
+    HttpClientWrapper = new HttpClientWrapper();
 }
 
 public bool SendRequest(HttpRequestMessage message, out string answer)
@@ -189,7 +184,7 @@ public bool SendRequest(HttpRequestMessage message, out string answer)
 
     try
     {
-        return _httpClientWrapper.SendRequest(message, out answer);
+        return HttpClientWrapper.SendRequest(message, out answer);
     }
     catch (Exception)
     {
